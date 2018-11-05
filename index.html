@@ -1,0 +1,100 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Accesing Web camera </title>
+
+    <video id="video" ></video>
+    <canvas id="canvas"></canvas> <br>
+    <button id="snap" onclick="snap();" >Snap</button>
+
+    <img id="imagen" src="" alt="">
+   
+    <script type="text/javascript">
+        //var video = document.querySelector("#videoElement");
+        var video = document.getElementById("video");
+        var canvas = document.getElementById("canvas"); //.getContext('2d');
+        var context = canvas.getContext('2d');
+        
+       
+        function alExito(info){
+           
+           //alert(info.coords.longitude);
+           document.getElementById("latitud").value = info.coords.latitude;
+           document.getElementById("longitud").value = info.coords.longitude;
+           document.getElementById("altitud").value = info.coords.altitud;
+        }
+
+        function alError(error){
+            console.log("no se permitio el acceso a la camara");
+        }
+
+        function detener(){
+            var observador = navigator.geolocation.getCurrentPosition(alExito, alError);
+            navigator.geolocation.clearWatch(observador);
+        }
+        
+
+        //window.URL = window.URL || window.webkitURL;
+
+       navigator.getUserMedia = (navigator.getUserMedia ||
+                                navigator.webkitGetUserMedia ||
+                                navigator.mozGetUserMedia || 
+                                navigator.msGetUserMedia);
+
+        if(navigator.getUserMedia)
+            navigator.getUserMedia({video:true, audio:false}, streamWebCam, throwError);
+        else
+            alert("error al activar la camara");
+
+        function streamWebCam(stream){
+            //video.src = window.URL.createObjectURL(stream);
+            video.srcObject = stream;
+            video.play();
+        }
+
+        function throwError(err){
+            //alert(e.name);
+            console.log("Ocurrió el siguiente error: " + err);
+        }
+
+        function snap(){
+            
+            var video = document.getElementById("video");
+            var c = document.getElementById("canvas");
+
+            c.height = video.clientHeight;
+            c.width = video.clientWidth;
+
+            context.drawImage(video, 10, 10 );
+
+            var dataURL = canvas.toDataURL("image/jpeg");
+            console.log(dataURL);
+            console.log(dataURL.length/1024);
+         
+        }
+
+    </script>
+</head>
+<body>
+
+    <div>
+
+        <button onclick="detener();" >Detener</button> <br><br>
+
+        <span>Latitud:</span><input type="text" id="latitud"><br>
+        <span>Longitud:</span><input type="text" id="longitud"><br>
+        <span>Altitud:</span><input type="text" id="altitud"><br>
+
+    </div>
+
+    <div id="container"  bgcolor="skyblue">
+        <video autoplay="true" id="videoElement" >
+        </video>
+    </div>
+    <input type="file" accept="video/*;capture=camcorder">
+    <input type="file" accept="audio/*;capture=microphone">
+
+</body>
+</html>
